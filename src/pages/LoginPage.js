@@ -1,57 +1,37 @@
 import React from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import db, { auth, googleProvider } from "../firebase";
+import { useStateValue } from "../redux/StateProvider";
+import { actionTypes } from "../redux/reducer";
+import { Link, useHistory } from "react-router-dom";
 
 const LoginPage = () => {
+  const [, dispatch] = useStateValue();
+  const history = useHistory();
+
   const googleLogin = () => {
     auth
       .signInWithPopup(googleProvider)
       .then(async () => {
-        const localUser = auth.currentUser;
-        alert(`Użytkownik: ${localUser.email}, ${localUser.uid}`);
+        if (auth.currentUser) {
+          let localUser = {
+            id: auth.currentUser.uid,
+            name: auth.currentUser.displayName,
+            email: auth.currentUser.email,
+          };
+          dispatch({
+            type: actionTypes.LOGIN_USER,
+            user: localUser,
+          });
+
+          history.push("/catalog");
+        } else {
+          alert("Błąd logowania");
+        }
       })
       .catch((error) => {
         alert(`Błąd: ${error.message}`);
       });
-
-    // auth
-    // .signInWithPopup(googleProvider)
-    // .then(async () => {
-    //   const success = auth.currentUser;
-    //   if (success) {
-    //     const initials = getInitials(success.displayName);
-    //     let currentUser = {
-    //       id: success.uid,
-    //       name: success.displayName,
-    //       email: success.email,
-    //       photoURL: success.photoURL,
-    //       initials: initials,
-    //       recordPrice: 0,
-    //     };
-    //     const playerRef = db.collection("players").doc(currentUser.id);
-    //     const doc = await playerRef.get();
-    //     if (!doc.exists) {
-    //       await db.collection("players").doc(currentUser.id).set({
-    //         id: currentUser.id,
-    //         name: currentUser.name,
-    //         email: currentUser.email,
-    //         photoURL: currentUser.photoURL,
-    //         initials: currentUser.initials,
-    //         recordPrice: 0,
-    //       });
-    //     } else {
-    //       currentUser = doc.data();
-    //     }
-    //     dispatch({
-    //       type: actionTypes.SET_USER,
-    //       user: currentUser,
-    //     });
-    //     history.push("/dashboard");
-    //   }
-    // })
-    // .catch((error) => {
-    //   alert(error.message);
-    // });
   };
 
   return (
@@ -106,6 +86,11 @@ const LoginPage = () => {
               <br />
               Aby się logować wpisz w pola po lewej swój adres email oraz hasło
               lub skorzystaj z opcji "Zaloguj się z Google".
+              <br />
+              <br />
+              Jeżeli nie jesteś jeszcze naszym Użytkownikiem i nie posiadasz
+              konta Google{" "}
+              <Link to="/register">załóż konto w naszym serwisie.</Link>
             </p>
           </Col>
         </Row>

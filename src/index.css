@@ -14,6 +14,12 @@
   margin-bottom: 15px;
 }
 
+.menu_link {
+  border: 0;
+  background-color: white;
+  color: blue;
+}
+
 .menu_link:hover {
   text-decoration: none;
   font-weight: 700;
