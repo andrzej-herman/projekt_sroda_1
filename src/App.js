@@ -10,6 +10,7 @@ import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./PrivateRoute";
 import RegisterPage from "./pages/RegisterPage";
+import EmailVerificationPage from "./pages/EmailVerificationPage";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/contact" exact component={ContactPage} />
           <Route path="/login" exact component={LoginPage} />
           <Route path="/register" exact component={RegisterPage} />
+          <Route path="/emailverification" exact component={EmailVerificationPage} />
         </Switch>
       </Container>
       <Footer />

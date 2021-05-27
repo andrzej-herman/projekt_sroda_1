@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Row, Col, Form, Button } from "react-bootstrap";
+import db, { auth, googleProvider } from "../firebase";
+import { Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const RegisterPage = () => {
@@ -7,6 +8,7 @@ const RegisterPage = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
+  const [registerError, setRegisterError] = useState(null);
 
   const changeEmail = (e) => {
     setEmail(e.target.value);
@@ -22,10 +24,27 @@ const RegisterPage = () => {
   };
 
   const register = () => {
-    alert(
-      `Email: ${email}, Imię i nazwisko: ${firstName} ${lastName}, Hasło: ${password}`
-    );
+    const fullName = `${firstName} ${lastName}`;
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        // imie i nazwisko
+        // wysłać  email do weryfikacji
+        // zapisać emailToVerify
+        // przenieść uzytkownika na stronę emailverification
+        setRegisterError("OK !!!");
+      })
+      .catch((error) => {
+        if (error.code === "auth/email-already-in-use") {
+          setRegisterError("Podany adres email jest już zarejestrowany.");
+        } else if (error.code === "auth/weak-password") {
+          setRegisterError("Minimalna długość hasła to 6 znaków.");
+        } else {
+          setRegisterError("Wystąpił błąd. Proszę spróbować jeszcze raz.");
+        }
+      });
   };
+
   return (
     <div className="login">
       <h3>Załóż konto w serwisie</h3>
@@ -74,8 +93,8 @@ const RegisterPage = () => {
               </Form.Group>
               <Button
                 variant="primary"
-                type="submit"
                 className="btn-block mt-4"
+                type="button"
                 onClick={register}
               >
                 Załóż konto
@@ -94,6 +113,10 @@ const RegisterPage = () => {
               Jeżeli posiadasz już konto w naszym serwisie{" "}
               <Link to="/login">zaloguj się.</Link>
             </p>
+            <br />
+            {registerError ? (
+              <Alert variant="danger">{registerError}</Alert>
+            ) : null}
           </Col>
         </Row>
       </div>
